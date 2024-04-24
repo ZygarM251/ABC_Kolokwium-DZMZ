@@ -1,73 +1,81 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 
-struct MyStruct {
+struct Struktura {
     int i;
     double d;
 };
 
-MyStruct* createArray(int size, const MyStruct& prototype) {
-    MyStruct* arr = new MyStruct[size];
-    for (int i = 0; i < size; ++i) {
-        arr[i] = prototype;
+Struktura* stworzTablice(int rozmiar, const Struktura& prototyp) {
+    Struktura* tablica = new Struktura[rozmiar];
+    for (int i = 0; i < rozmiar; ++i) {
+        tablica[i] = prototyp;
     }
-    return arr;
+    return tablica;
 }
 
-void writeArrayToFile(const char* filename, int size, const MyStruct& prototype) {
-    std::ofstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file for writing." << std::endl;
+void zapiszTabliceDoPliku(const char* nazwaPliku, int rozmiar, const Struktura& prototyp) {
+    std::ofstream plik(nazwaPliku);
+    if (!plik.is_open()) {
+        std::cerr << "Nie mozna otworzyc pliku do zapisu" << std::endl;
         return;
     }
 
-    file << size << "\n";
-    for (int i = 0; i < size; ++i) {
-        file << prototype.i << " " << prototype.d << "\n";
+    plik << rozmiar << "\n";
+    for (int i = 0; i < rozmiar; ++i) {
+        plik << prototyp.i << " " << prototyp.d << "\n";
     }
 
-    file.close();
+    plik.close();
 }
 
-MyStruct* readArrayFromFile(const char* filename) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file for reading." << std::endl;
+Struktura* odczytajZPliku(const char* nazwaPliku) {
+    std::ifstream plik(nazwaPliku);
+    if (!plik.is_open()) {
+        std::cerr << "Nie mozna otworzyc pliku do odczytu" << std::endl;
         return nullptr;
     }
 
-    int size;
-    file >> size;
-    MyStruct* arr = new MyStruct[size];
-    for (int i = 0; i < size; ++i) {
-        file >> arr[i].i >> arr[i].d;
+    int rozmiar;
+    plik >> rozmiar;
+    Struktura* tablica = new Struktura[rozmiar];
+    for (int i = 0; i < rozmiar; ++i) {
+        plik >> tablica[i].i >> tablica[i].d;
     }
 
-    file.close();
-    return arr;
+    plik.close();
+    return tablica;
 }
 
 int main() {
-    const char* filename = "array.txt";
-    MyStruct prototype = { 1, 3.14 };
-    MyStruct* arr = createArray(83, prototype);
+    const char* nazwaPliku = "tablica.txt";
+    Struktura prototyp = { 1, 3.14 };
+    //duze Z w ASCII to 90
+    Struktura* tworzonaTablica = stworzTablice(90, prototyp);
 
-    writeArrayToFile(filename, 83, prototype);
+    zapiszTabliceDoPliku(nazwaPliku, 90, prototyp);
 
-    MyStruct* arr2 = readArrayFromFile(filename);
+    Struktura* odczytanaTablica = odczytajZPliku(nazwaPliku);
 
-    bool areArraysIdentical = true;
-    for (int i = 0; i < 83; ++i) {
-        if (arr[i].i != arr2[i].i || arr[i].d != arr2[i].d) {
-            areArraysIdentical = false;
+    bool czySaIdentyczne = true;
+    for (int i = 0; i < 90; ++i) {
+        if (tworzonaTablica[i].i != odczytanaTablica[i].i || tworzonaTablica[i].d != odczytanaTablica[i].d) {
+            czySaIdentyczne = false;
             break;
         }
     }
 
-    std::cout << "Are the arrays identical? " << (areArraysIdentical ? "Yes" : "No") << std::endl;
 
-    delete[] arr;
-    delete[] arr2;
+    std::cout << "Czy sa identyczne?:\t";
+    if (czySaIdentyczne) {
+        std::cout << "Tak\n";
+    }
+    else {
+        std::cout << "Nie\n";
+    }
+
+    delete[] tworzonaTablica;
+    delete[] odczytanaTablica;
 
     return 0;
 }
