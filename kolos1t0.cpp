@@ -1,5 +1,5 @@
 #include <iostream>
-#include <fstream>
+#include <cstdio>
 
 struct Struktura {
     int i;
@@ -15,35 +15,36 @@ Struktura* stworzTablice(int rozmiar, const Struktura& prototyp) {
 }
 
 void zapiszTabliceDoPliku(const char* nazwaPliku, int rozmiar, const Struktura& prototyp) {
-    std::ofstream plik(nazwaPliku);
-    if (!plik.is_open()) {
+    FILE* plik = fopen(nazwaPliku, "w");
+    if (plik == NULL) {
         std::cerr << "Nie mozna otworzyc pliku do zapisu" << std::endl;
         return;
     }
 
-    plik << rozmiar << "\n";
+    fprintf(plik, "%d\n", rozmiar);
     for (int i = 0; i < rozmiar; ++i) {
-        plik << prototyp.i << " " << prototyp.d << "\n";
+        fprintf(plik, "%d %f\n", prototyp.i, prototyp.d);
     }
 
-    plik.close();
+    fclose(plik);
 }
 
 Struktura* odczytajZPliku(const char* nazwaPliku) {
-    std::ifstream plik(nazwaPliku);
-    if (!plik.is_open()) {
+    FILE* plik = fopen(nazwaPliku, "r");
+    if (plik == NULL) {
         std::cerr << "Nie mozna otworzyc pliku do odczytu" << std::endl;
         return nullptr;
     }
 
     int rozmiar;
-    plik >> rozmiar;
+
+    fscanf(plik, "%d\n", &rozmiar);
     Struktura* tablica = new Struktura[rozmiar];
     for (int i = 0; i < rozmiar; ++i) {
-        plik >> tablica[i].i >> tablica[i].d;
+        fscanf(plik, "%d %lf\n", &tablica[i].i, &tablica[i].d);
     }
 
-    plik.close();
+    fclose(plik);
     return tablica;
 }
 
